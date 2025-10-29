@@ -2,25 +2,25 @@
 #define FSM_H
 
 #include <Arduino.h>
-#include "Communication.h"
-#include "Actuators.h"
-#include "Sensors.h"
+#include "recycling_robot.h"
 
 class FSM {
   public:
-    FSM(Communication& comm, Actuators& actuators, Sensors& sensors);
+    FSM(Recycling_robot& robot);
 
     void run();  // Se llama en loop()
-    void handleEstado(int nuevoEstado);
-    void handleResiduo(int nuevoResiduo);
 
   private:
-    Communication& comm;
-    Actuators& actuators;
-    Sensors& sensors;
+
+    Recycling_robot& robot;
 
     int currentState;
+    int previousState = -1;
     int residuoId;
+
+    bool lightsOn = false;
+    bool firstEntry = true;
+    unsigned long stateEntryTime = 0;
 
     void stateHibernacion();
     void stateDespertando();

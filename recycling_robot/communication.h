@@ -5,9 +5,11 @@
 
 class Communication {
 public:
+  void init();
   void sendMessage(const String& msg);
-  String readMessage();
+  int readIntValue(const String& expectedPrefix);
 
+  int baud_rate;
 };
 
 #endif

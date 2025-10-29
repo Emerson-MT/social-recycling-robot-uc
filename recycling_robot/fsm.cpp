@@ -1,9 +1,22 @@
-#include "FSM.h"
+#include "fsm.h"
 
-FSM::FSM(Communication& c, Actuators& a, Sensors& s)
-  : comm(c), actuators(a), sensors(s), currentState(0), residuoId(-1) {}
+FSM::FSM(Recycling_robot& robot)
+  : robot(robot), currentState(0), residuoId(-1) {}
 
 void FSM::run() {
+  int newState = robot.comm.readIntValue("ESTADO"); // retorna -2 si no hay nueva indicación de estado
+
+  if (newState != -2) {  // -2 = sin mensaje nuevo
+    if (newState != currentState) {
+      previousState = currentState;
+      currentState = newState;
+      firstEntry = true;  // acabamos de entrar al nuevo estado
+      lightsOn = false;   // reiniciar persistentes
+    }
+  } else {
+    firstEntry = false; // no entramos a un estado nuevo
+  }
+  
   switch (currentState) {
     case 0: stateHibernacion(); break;
     case 1: stateDespertando(); break;
@@ -14,37 +27,92 @@ void FSM::run() {
   }
 }
 
-void FSM::handleEstado(int nuevoEstado) {
-  currentState = nuevoEstado;
-  comm.sendMessage("OK_ESTADO");
-}
-
-void FSM::handleResiduo(int nuevoResiduo) {
-  residuoId = nuevoResiduo;
-  comm.sendMessage("OK_RESIDUO");
-  actuators.segregateResidue(residuoId);
-}
-
 // ======= ESTADOS =======
 
-void FSM::stateHibernacion() {
-  if (sensors.detectUser()) comm.sendMessage("USER_DETECTED");
-  if (sensors.detectWaste()) comm.sendMessage("WASTE_DETECTED");
+void FSM::stateHibernacion(){
+  if (robot.sensors.detectUser()){
+    robot.comm.sendMessage("USUARIO:1");
+    currentState = -1;
+  } 
+  if (robot.sensors.detectWaste()){
+    robot.comm.sendMessage("RES_EN_POS:1");
+    currentState = -1;
+  }
 }
 
 void FSM::stateDespertando() {
-  actuators.blinkSoftly();
+
+  static unsigned long startTime = 0;
+
+  if (firstEntry) {
+    startTime = millis();
+    firstEntry = false;
+  }
+
+  robot.actuators.setLightsMode('dimming');
+
+  // Verifica si se detectó el residuo
+  if (robot.sensors.detectWaste()) {
+    robot.comm.sendMessage("RES_EN_POS:1");
+    currentState = -1;
+  }
+
+  // Verifica si ya pasaron más de 3 segundos (3000 ms)
+  if (millis() - startTime > 3000) {
+    currentState = -1;
+  }
 }
 
 void FSM::stateClasificar1() {
-  // Ejemplo: encender luces y preparar segregación
-  actuators.showReadyPattern();
+
+  if (firstEntry) {
+    robot.actuators.setLightsMode('full');
+    lightsOn = true;
+    stateEntryTime = millis();  // guardamos el momento en que entró
+    firstEntry = false;  // <-- importante
+  }
+
+  // Apagar luces después de 3 segundos sin bloquear
+  if (lightsOn && millis() - stateEntryTime > 3000) {
+    robot.actuators.setLightsMode('off');
+    lightsOn = false;
+  }
+
+  residuoId = robot.comm.readIntValue("RESIDUO");
+
+  if (residuoId != -1) {
+    robot.actuators.sortTrash(residuoId);
+    currentState = -1; // listo para volver a estado neutro o esperar otro comando
+  }
 }
 
+
 void FSM::stateClasificar2() {
-  actuators.playInteractionPattern();
+
+  if (firstEntry) {
+    robot.actuators.setLightsMode('full');
+    lightsOn = true;
+    stateEntryTime = millis();  // guardamos el momento en que entró
+    firstEntry = false;  // <-- importante
+  }
+
+  // Apagar luces después de 3 segundos sin bloquear
+  if (lightsOn && millis() - stateEntryTime > 3000) {
+    robot.actuators.setLightsMode('off');
+    lightsOn = false;
+  }
+
+  residuoId = robot.comm.readIntValue("RESIDUO");
+
+  if (residuoId != -1) {
+    robot.actuators.sortTrash(residuoId);
+    currentState = -1; // listo para volver a estado neutro o esperar otro comando
+  }
 }
 
 void FSM::stateAgradecimiento() {
-  actuators.playGratefulPattern();
+  if (firstEntry) {
+    robot.actuators.setLightsMode('byebye');
+    firstEntry = false;
+  }
 }
