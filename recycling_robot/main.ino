@@ -7,9 +7,6 @@
 // Configuración i2c para sensores
 #define SDA_PIN 21
 #define SCL_PIN 22
-#define XSHUT_PIN_USER_LEFT 24  // pin para habilitar o apagar el sensor
-#define XSHUT_PIN_USER_RIGHT 25  // pin para habilitar o apagar el sensor
-#define XSHUT_PIN_WASTE 26  // pin para habilitar o apagar el sensor
 
 // Configuración serial
 #define BAUD_RATE 9600
