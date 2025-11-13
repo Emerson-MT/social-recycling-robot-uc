@@ -1,27 +1,23 @@
 #include "communication.h"
-#include "actuators.h"
+#include "servo_controller.h"
+#include "led_controller.h"
 #include "sensor.h"
 #include "recycling_robot.h"
 #include "fsm.h"
 
-// Configuración i2c para sensores
-#define SDA_PIN 21
-#define SCL_PIN 22
-
 // Configuración serial
 #define BAUD_RATE 9600
 
-// Configuración de los actuadores
-// Luces
+// Configuración LEDs
 #define PIN_LED    18
 #define NUM_LEDS   80
 #define BRIGHT     127
-// Servos
-// Definimos los canales del PCA9685 donde están los servos
+
+// Servos PCA9685
 #define SERVO_1 7
 #define SERVO_2 8
 
-// Pines XSHUT
+// Pines XSHUT sensores
 #define XSHUT_USER1 13
 #define XSHUT_USER2 14
 #define XSHUT_WASTE 25
@@ -30,28 +26,31 @@
 Sensor sensorUser1(XSHUT_USER1, 0x30);
 Sensor sensorUser2(XSHUT_USER2, 0x31);
 Sensor sensorWaste(XSHUT_WASTE, 0x32);
+
 // Detectores
 UserDetector userDetector(sensorUser1, sensorUser2);
 WasteDetector wasteDetector(sensorWaste);
+
 // Instancia global del conjunto de sensores
-RobotSensors robotSensors = { userDetector, wasteDetector};
+RobotSensors robotSensors = {&userDetector, &wasteDetector};
 
 // Crear instancia de comunicación
 Communication comm(BAUD_RATE);
 
-// Crear instancia de actuadores
-Actuators actuators(PIN_LED, NUM_LEDS, BRIGHT, SERVO_1, SERVO_2);
+// Crear instancias de actuadores
+LEDController leds(PIN_LED, NUM_LEDS, BRIGHT);
+ServoController servos(SERVO_1, SERVO_2);
 
-// Instancia global del robot que contiene todo
-RecyclingRobot robot(comm, actuators, robotSensors);
+// Instancia global del robot
+RecyclingRobot robot(comm, servos, leds, robotSensors);
 
 // Instancia global de la FSM
 FSM fsm(robot);
 
 void setup() {
-  robot.init();
+    robot.init();
 }
 
 void loop() {
-  fsm.run();
+    fsm.run();
 }
