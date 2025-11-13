@@ -1,32 +1,73 @@
 #include "sensor.h"
-#include <Wire.h>
+#include <Arduino.h>
 
-Sensor::Sensor(int sda_pin, int scl_pin, int shut_pin)
-  : sda_pin(sda_pin), scl_pin(scl_pin), shut_pin(shut_pin) {}
+// ---------------- Sensor ----------------
+Sensor::Sensor(uint8_t xshutPin, uint8_t address)
+  : xshutPin(xshutPin), address(address) {}
 
 void Sensor::init() {
+  pinMode(xshutPin, OUTPUT);
+  digitalWrite(xshutPin, LOW);
+  delay(10);
+  digitalWrite(xshutPin, HIGH);
+  delay(10);
 
-  Wire.begin(sda_pin, scl_pin);
-
-  pinMode(shut_pin, OUTPUT);
-  digitalWrite(shut_pin, LOW);
-  delay(10);                     // se apaga el sensor
-  digitalWrite(shut_pin, HIGH); 
-  delay(10);                     // se reinicia
-
-  sensor_ok = lox.begin(0x29, &Wire);
-
-  if (!sensor_ok) {
-    Serial.println(F("❌ No se detecta VL53L0X"));
+  if (!lox.begin(address)) {
+    Serial.print(F("❌ Sensor en XSHUT "));
+    Serial.print(xshutPin);
+    Serial.println(F(" no detectado"));
     while (true) delay(1000);
   }
-  Serial.println(F("✅ VL53L0X detectado correctamente"));
+  Serial.print(F("✅ Sensor en XSHUT "));
+  Serial.print(xshutPin);
+  Serial.println(F(" inicializado correctamente"));
 }
 
-bool Sensors::detectUser() {
-  return digitalRead(irUserPin);
+uint16_t Sensor::readDistance() {
+  VL53L0X_RangingMeasurementData_t measure;
+  lox.rangingTest(&measure, false);
+  if (measure.RangeStatus != 4) {
+    return measure.RangeMilliMeter;
+  } else {
+    return 8190; // valor de error o "fuera de rango"
+  }
 }
 
-bool Sensors::detectWaste() {
-  return digitalRead(irWastePin);
+// ---------------- UserDetector ----------------
+UserDetector::UserDetector(Sensor& s1, Sensor& s2)
+  : sensorA(s1), sensorB(s2) {}
+
+bool UserDetector::detectUser() {
+  unsigned long currentMillis = millis();
+  Sensor& activeSensor = useFirstSensor ? sensorA : sensorB;
+
+  uint16_t dist = activeSensor.readDistance();
+  float deltaTime = (currentMillis - lastSwitchTime) / 1000.0; // segundos
+  lastSwitchTime = currentMillis;
+
+  // Alternar sensor
+  useFirstSensor = !useFirstSensor;
+
+  // Actualizar acumulador
+  if (dist < 1000) { // 1 metro en mm
+    detectionAccum += deltaTime;
+    lastDetectionTime = currentMillis;
+  } else if ((currentMillis - lastDetectionTime) > 3000) {
+    detectionAccum = 0; // reiniciar si no hay detección en 3 s
+  }
+
+  // Retornar true si la acumulación supera 2 segundos
+  if (detectionAccum >= 2.0) {
+    detectionAccum = 0; // reset para siguiente detección
+    return true;
+  }
+  return false;
+}
+
+// ---------------- WasteDetector ----------------
+WasteDetector::WasteDetector(Sensor& s) : sensor(s) {}
+
+bool WasteDetector::detectWaste() {
+  uint16_t dist = sensor.readDistance();
+  return dist < threshold;
 }
