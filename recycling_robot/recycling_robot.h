@@ -5,12 +5,12 @@
 #include "communication.h"
 #include "actuators.h"
 #include "sensor.h"
+#include <Wire.h>
 
 // Estructura que agrupa los sensores del robot
 struct RobotSensors {
-  Sensors& user_left;
-  Sensors& user_right;
-  Sensors& waste;
+  UserDetector& userdetector;
+  WasteDetector& wastedetector;
 };
 
 class RecyclingRobot {

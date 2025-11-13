@@ -6,10 +6,9 @@ RecyclingRobot::RecyclingRobot(Communication& c, Actuators& a, RobotSensors& s)
 
 void RecyclingRobot::init() {
 
-  sensors.user_left.init();
-  sensors.user_right.init();
-  sensors.waste.init();
-
+  sensors.userdetector.init();
+  sensors.wastedetector.init();
   actuators.init();
-  comm.init(); // solo si lo implementas
+  comm.init(); 
+  Wire.begin(21, 22);
 }

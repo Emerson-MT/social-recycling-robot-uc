@@ -24,14 +24,27 @@
 #define SERVO_1 7
 #define SERVO_2 8
 
-// Instancias globales de los componentes
-Communication comm(BAUD_RATE);
-Actuators actuators(PIN_LED, NUM_LEDS, BRIGHT, SERVO_1, SERVO_2);
-Sensor user_left_sensor(SDA_PIN, SCL_PIN, XSHUT_PIN_USER_LEFT);
-Sensor user_right_sensor(SDA_PIN, SCL_PIN, XSHUT_PIN_USER_RIGHT);
-Sensor waste_sensor(SDA_PIN, SCL_PIN, XSHUT_PIN_WASTE);
+// Pines XSHUT
+#define XSHUT_USER1 13
+#define XSHUT_USER2 14
+#define XSHUT_WASTE 25
+
+// Crear instancias de sensores
+Sensor sensorUser1(XSHUT_USER1, 0x30);
+Sensor sensorUser2(XSHUT_USER2, 0x31);
+Sensor sensorWaste(XSHUT_WASTE, 0x32);
+// Detectores
+UserDetector userDetector(sensorUser1, sensorUser2);
+WasteDetector wasteDetector(sensorWaste);
 // Instancia global del conjunto de sensores
-RobotSensors robotSensors = { user_left_sensor, user_right_sensor, waste_sensor };
+RobotSensors robotSensors = { userDetector, wasteDetector};
+
+// Crear instancia de comunicación
+Communication comm(BAUD_RATE);
+
+// Crear instancia de actuadores
+Actuators actuators(PIN_LED, NUM_LEDS, BRIGHT, SERVO_1, SERVO_2);
+
 // Instancia global del robot que contiene todo
 RecyclingRobot robot(comm, actuators, robotSensors);
 
