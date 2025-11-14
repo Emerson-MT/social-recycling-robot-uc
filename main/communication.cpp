@@ -1,4 +1,4 @@
-#include "Communication.h"
+#include "communication.h"
 
 Communication::Communication(int br)
   : baud_rate(br){}
@@ -48,5 +48,3 @@ int Communication::readIntValue(const String& expectedPrefix) {
   // Si no había nada que leer
   return -2;
 }
-
-

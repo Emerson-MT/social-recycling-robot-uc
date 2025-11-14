@@ -5,6 +5,7 @@
 
 class Communication {
 public:
+  Communication(int br);
   void init();
   void sendMessage(const String& msg);
   int readIntValue(const String& expectedPrefix);

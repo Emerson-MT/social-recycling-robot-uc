@@ -9,13 +9,13 @@
 #define BAUD_RATE 9600
 
 // Configuración LEDs
-#define PIN_LED    18
+#define PIN_LED    32
 #define NUM_LEDS   80
 #define BRIGHT     127
 
 // Servos PCA9685
-#define SERVO_1 7
-#define SERVO_2 8
+#define SERVO_1 14
+#define SERVO_2 15
 
 // Pines XSHUT sensores
 #define XSHUT_USER1 13

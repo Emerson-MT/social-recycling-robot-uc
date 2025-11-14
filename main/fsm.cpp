@@ -1,6 +1,6 @@
 #include "fsm.h"
 
-FSM::FSM(Recycling_robot& robot)
+FSM::FSM(RecyclingRobot& robot)
   : robot(robot), currentState(0), residuoId(-1) {}
 
 void FSM::run() {

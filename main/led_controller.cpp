@@ -7,7 +7,7 @@ LEDController::LEDController(int pin, int numLeds, int brightness)
 
 void LEDController::init() {
     FastLED.setMaxPowerInVoltsAndMilliamps(5, 1500);
-    FastLED.addLeds<WS2812B, PIN_LED, GRB>(leds, numLeds);
+    FastLED.addLeds<WS2812B, ledPin, GRB>(leds, numLeds);
     FastLED.setBrightness(bright);
     FastLED.clear(true);
 }
