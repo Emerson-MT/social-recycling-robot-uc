@@ -42,8 +42,21 @@ bool RecyclingRobot::isMotionComplete() {
     return servos.isMotionComplete();
 }
 
-void Recycling_robot::setTargetAngles(int t){
-    servos.setTargetAngles(t);
+void RecyclingRobot::setTargetBin(int binId){
+    // Convertir el ID numérico a BinTarget enum
+    BinTarget target;
+    switch(binId) {
+        case 0: target = BIN_HOME; break;
+        case 1: target = BIN_1; break;    // Cartón
+        case 2: target = BIN_2; break;    // Papel
+        case 3: target = BIN_3; break;    // Plástico
+        case 4: target = BIN_4; break;    // Residuo general
+        default: 
+            Serial.println("⚠ BinID inválido, usando HOME");
+            target = BIN_HOME; 
+            break;
+    }
+    servos.setTargetBin(target);
 }
 
 // // Métodos de conveniencia para comunicación
