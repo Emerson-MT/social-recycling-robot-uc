@@ -71,3 +71,4 @@ bool WasteDetector::detectWaste() {
   uint16_t dist = sensor.readDistance();
   return dist < threshold;
 }
+
