@@ -49,9 +49,7 @@ void FSM::stateDespertando() {
     firstEntry = false;
   }
 
-  // setLightsMode solo acepta int
-  //robot.setLightsMode('dimming');
-  robot.setLightsMode(1);
+  robot.setLightsMode(1);  // 1 = dimming (parpadeo lento)
 
   // Verifica si se detectó el residuo
   if (robot.detectWaste()) {
@@ -68,25 +66,33 @@ void FSM::stateDespertando() {
 void FSM::stateClasificar1() {
 
   if (firstEntry) {
-    //robot.setLightsMode('full');
-    robot.setLightsMode(2);
+    robot.setLightsMode(2);  // 2 = full (encendido completo inicial)
     lightsOn = true;
-    stateEntryTime = millis();  // guardamos el momento en que entró
-    firstEntry = false;  // <-- importante
+    stateEntryTime = millis();
+    firstEntry = false;
 
     residuoId = robot.readIntValue("RESIDUO");
     if (residuoId != -1) {
       robot.setTargetBin(residuoId);
+      
+      // Ejecutar animación LED según tipo de residuo
+      switch(residuoId) {
+        case 0: robot.setLightsMode(0); break;   // HOME → OFF
+        case 1: robot.setLightsMode(10); break;  // Cartón → Marrón
+        case 2: robot.setLightsMode(7); break;   // Papel → Azul
+        case 3: robot.setLightsMode(6); break;   // Plástico → Blanco
+        case 4: robot.setLightsMode(8); break;   // General → Gris
+        default: robot.setLightsMode(2); break;  // Default → Full
+      }
     }
   }
 
   // mover servos de forma continua (no bloqueante)
   robot.moveAllServosSmooth();
 
-  // Apagar luces después de 3 segundos sin bloquear
-  if (lightsOn && millis() - stateEntryTime > 3000) {
-    //robot.setLightsMode('off');
-    robot.setLightsMode(0);
+  // Apagar luces después de animación completa
+  if (lightsOn && millis() - stateEntryTime > 5000) {  // 5s para dar tiempo a animación
+    robot.setLightsMode(0);  // 0 = off (apagado)
     lightsOn = false;
   }
 
@@ -100,25 +106,33 @@ void FSM::stateClasificar1() {
 void FSM::stateClasificar2() {
 
   if (firstEntry) {
-    //robot.setLightsMode('full');
-    robot.setLightsMode(2);
+    robot.setLightsMode(2);  // 2 = full (encendido completo inicial)
     lightsOn = true;
-    stateEntryTime = millis();  // guardamos el momento en que entró
-    firstEntry = false;  // <-- importante
+    stateEntryTime = millis();
+    firstEntry = false;
 
     residuoId = robot.readIntValue("RESIDUO");
     if (residuoId != -1) {
       robot.setTargetBin(residuoId);
+      
+      // Ejecutar animación LED según tipo de residuo
+      switch(residuoId) {
+        case 0: robot.setLightsMode(0); break;   // HOME → OFF
+        case 1: robot.setLightsMode(10); break;  // Cartón → Marrón
+        case 2: robot.setLightsMode(7); break;   // Papel → Azul
+        case 3: robot.setLightsMode(6); break;   // Plástico → Blanco
+        case 4: robot.setLightsMode(8); break;   // General → Gris
+        default: robot.setLightsMode(2); break;  // Default → Full
+      }
     }
   }
 
   // mover servos de forma continua (no bloqueante)
   robot.moveAllServosSmooth();
 
-  // Apagar luces después de 3 segundos sin bloquear
-  if (lightsOn && millis() - stateEntryTime > 3000) {
-    //robot.setLightsMode('off');
-    robot.setLightsMode(0);
+  // Apagar luces después de animación completa
+  if (lightsOn && millis() - stateEntryTime > 5000) {  // 5s para dar tiempo a animación
+    robot.setLightsMode(0);  // 0 = off (apagado)
     lightsOn = false;
   }
 
@@ -130,8 +144,7 @@ void FSM::stateClasificar2() {
 
 void FSM::stateAgradecimiento() {
   if (firstEntry) {
-    //robot.setLightsMode('byebye');
-    robot.setLightsMode(4);
+    robot.setLightsMode(4);  // 4 = byebye (patrón de despedida)
     firstEntry = false;
   }
 }
