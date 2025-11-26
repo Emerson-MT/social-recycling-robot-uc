@@ -6,7 +6,7 @@
  * GPIO 22 (SCL) -> PCA9685 SCL, VL53L0X (todos) SCL
  * 
  * === LEDs ===
- * GPIO 32 -> LED_DATA (WS2812B)
+ * GPIO 32 -> LED_DATA (WS2812B - 80 LEDs direccionables)
  * 
  * === SENSORES VL53L0X (XSHUT) ===
  * GPIO 13 -> XSHUT sensor usuario 1
