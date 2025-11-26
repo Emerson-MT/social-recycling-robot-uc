@@ -49,7 +49,9 @@ void FSM::stateDespertando() {
     firstEntry = false;
   }
 
-  robot.setLightsMode('dimming');
+  // setLightsMode solo acepta int
+  //robot.setLightsMode('dimming');
+  robot.setLightsMode(1);
 
   // Verifica si se detectó el residuo
   if (robot.detectWaste()) {
@@ -66,14 +68,15 @@ void FSM::stateDespertando() {
 void FSM::stateClasificar1() {
 
   if (firstEntry) {
-    robot.setLightsMode('full');
+    //robot.setLightsMode('full');
+    robot.setLightsMode(2);
     lightsOn = true;
     stateEntryTime = millis();  // guardamos el momento en que entró
     firstEntry = false;  // <-- importante
 
     residuoId = robot.readIntValue("RESIDUO");
     if (residuoId != -1) {
-      robot.setTargetAngles(residuoId);
+      robot.setTargetBin(residuoId);
     }
   }
 
@@ -82,7 +85,8 @@ void FSM::stateClasificar1() {
 
   // Apagar luces después de 3 segundos sin bloquear
   if (lightsOn && millis() - stateEntryTime > 3000) {
-    robot.setLightsMode('off');
+    //robot.setLightsMode('off');
+    robot.setLightsMode(0);
     lightsOn = false;
   }
 
@@ -96,14 +100,15 @@ void FSM::stateClasificar1() {
 void FSM::stateClasificar2() {
 
   if (firstEntry) {
-    robot.setLightsMode('full');
+    //robot.setLightsMode('full');
+    robot.setLightsMode(2);
     lightsOn = true;
     stateEntryTime = millis();  // guardamos el momento en que entró
     firstEntry = false;  // <-- importante
 
     residuoId = robot.readIntValue("RESIDUO");
     if (residuoId != -1) {
-      robot.setTargetAngles(residuoId);
+      robot.setTargetBin(residuoId);
     }
   }
 
@@ -112,7 +117,8 @@ void FSM::stateClasificar2() {
 
   // Apagar luces después de 3 segundos sin bloquear
   if (lightsOn && millis() - stateEntryTime > 3000) {
-    robot.setLightsMode('off');
+    //robot.setLightsMode('off');
+    robot.setLightsMode(0);
     lightsOn = false;
   }
 
@@ -124,7 +130,8 @@ void FSM::stateClasificar2() {
 
 void FSM::stateAgradecimiento() {
   if (firstEntry) {
-    robot.setLightsMode('byebye');
+    //robot.setLightsMode('byebye');
+    robot.setLightsMode(4);
     firstEntry = false;
   }
 }
