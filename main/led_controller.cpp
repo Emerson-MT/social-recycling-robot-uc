@@ -14,7 +14,29 @@ LEDController::~LEDController() {
 }
 
 void LEDController::init() {
-    FastLED.addLeds<WS2812B, ledPin, GRB>(leds, numLeds);
+    // FastLED requiere que el pin sea conocido en tiempo de compilación
+    // Usamos un switch para manejar los pines comunes
+    switch(ledPin) {
+        case 32:
+            FastLED.addLeds<WS2812B, 32, GRB>(leds, numLeds);
+            break;
+        case 13:
+            FastLED.addLeds<WS2812B, 13, GRB>(leds, numLeds);
+            break;
+        case 14:
+            FastLED.addLeds<WS2812B, 14, GRB>(leds, numLeds);
+            break;
+        case 25:
+            FastLED.addLeds<WS2812B, 25, GRB>(leds, numLeds);
+            break;
+        default:
+            Serial.print("⚠️ Pin ");
+            Serial.print(ledPin);
+            Serial.println(" no soportado. Usando pin 32 por defecto.");
+            FastLED.addLeds<WS2812B, 32, GRB>(leds, numLeds);
+            break;
+    }
+    
     FastLED.setBrightness(bright);
     FastLED.clear(true);
     Serial.println("✅ LEDController inicializado (WS2812B)");
