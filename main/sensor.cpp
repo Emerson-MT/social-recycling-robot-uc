@@ -37,6 +37,13 @@ uint16_t Sensor::readDistance() {
 UserDetector::UserDetector(Sensor& s1, Sensor& s2)
   : sensorA(s1), sensorB(s2) {}
 
+void UserDetector::init() {
+  // Inicializar ambos sensores
+  sensorA.init();
+  sensorB.init();
+  Serial.println("✅ UserDetector inicializado");
+}
+
 bool UserDetector::detectUser() {
   unsigned long currentMillis = millis();
   Sensor& activeSensor = useFirstSensor ? sensorA : sensorB;
@@ -67,8 +74,13 @@ bool UserDetector::detectUser() {
 // ---------------- WasteDetector ----------------
 WasteDetector::WasteDetector(Sensor& s) : sensor(s) {}
 
+void WasteDetector::init() {
+  // Inicializar el sensor de residuo
+  sensor.init();
+  Serial.println("✅ WasteDetector inicializado");
+}
+
 bool WasteDetector::detectWaste() {
   uint16_t dist = sensor.readDistance();
   return dist < threshold;
 }
-
