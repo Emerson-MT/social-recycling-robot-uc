@@ -72,7 +72,7 @@ RecyclingRobot robot(comm, servos, leds, robotSensors);
 FSM fsm(robot);
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     Serial.println("Iniciando sistema...");
     robot.init();
     Serial.println("Sistema listo!");
