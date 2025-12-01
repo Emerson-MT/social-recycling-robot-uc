@@ -30,7 +30,7 @@
 #include "fsm.h"
 
 // Configuración serial
-#define BAUD_RATE 9600
+#define BAUD_RATE 115200
 
 // Configuración LEDs
 #define PIN_LED    32
