@@ -73,9 +73,38 @@ FSM fsm(robot);
 
 void setup() {
     Serial.begin(115200);
-    Serial.println("Iniciando sistema...");
+    delay(100);
+    
+    Serial.println();
+    Serial.println("╔════════════════════════════════════════╗");
+    Serial.println("║   Sistema de Reciclaje PERI - ESP32   ║");
+    Serial.println("║   Baud Rate: 115200                    ║");
+    Serial.println("╚════════════════════════════════════════╝");
+    Serial.println();
+    
+    // ========== CRÍTICO: INICIALIZACIÓN DE SENSORES VL53L0X ==========
+    // IMPORTANTE: Apagar todos los sensores ANTES de inicializar
+    // Esto evita conflictos I2C (método del profesor)
+    
+    Serial.println("🔧 Preparando sensores VL53L0X...");
+    
+    // Array con todos los pines XSHUT
+    uint8_t xshutPins[] = {XSHUT_USER1, XSHUT_USER2, XSHUT_WASTE};
+    uint8_t numSensors = 3;
+    
+    // Llamar función global que apaga TODOS los sensores
+    initAllVL53L0XSensors(xshutPins, numSensors);
+    
+    // Ahora sí inicializar el robot (sensores se encienden uno por uno)
+    Serial.println("\n🤖 Inicializando robot...");
     robot.init();
-    Serial.println("Sistema listo!");
+    
+    Serial.println();
+    Serial.println("╔════════════════════════════════════════╗");
+    Serial.println("║   ✅ Sistema listo!                    ║");
+    Serial.println("║   Esperando comandos desde Python...   ║");
+    Serial.println("╚════════════════════════════════════════╝");
+    Serial.println();
 }
 
 void loop() {
