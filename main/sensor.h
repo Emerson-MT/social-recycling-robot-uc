@@ -40,4 +40,7 @@ class WasteDetector {
     const uint16_t threshold = 200; // 20 cm en mm
 };
 
+void initAllVL53L0XSensors(uint8_t* xshutPins, uint8_t numSensors);
+
 #endif
+
