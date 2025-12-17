@@ -4,7 +4,12 @@ FSM::FSM(RecyclingRobot& robot)
   : robot(robot), currentState(0), residuoId(-1) {}
 
 void FSM::run() {
-  int newState = robot.readIntValue("ESTADO"); // retorna -2 si no hay nueva indicación de estado
+
+  int newState;  // declarar antes del bucle
+
+  do {
+    newState = robot.readIntValue("ESTADO");  // retorna -2 si no hay nueva indicación de estado
+  } while (newState == -2);
 
   if (newState != -2) {  // -2 = sin mensaje nuevo
     if (newState != currentState) {
@@ -30,13 +35,15 @@ void FSM::run() {
 // ======= ESTADOS =======
 
 void FSM::stateHibernacion(){
-  if (robot.detectUser()){
-    robot.sendMessage("USUARIO:1");
-    currentState = -1;
-  } 
-  if (robot.detectWaste()){
-    robot.sendMessage("RES_EN_POS:1");
-    currentState = -1;
+  while(currentState != -1){
+    if (robot.detectUser()){
+      robot.sendMessage("USUARIO:1");
+      currentState = -1;
+    } 
+    if (robot.detectWaste()){
+      robot.sendMessage("RES_EN_POS:1");
+      currentState = -1;
+    }
   }
 }
 
@@ -87,9 +94,6 @@ void FSM::stateClasificar1() {
     }
   }
 
-  // mover servos de forma continua (no bloqueante)
-  robot.moveAllServosSmooth();
-
   // Apagar luces después de animación completa
   if (lightsOn && millis() - stateEntryTime > 5000) {  // 5s para dar tiempo a animación
     robot.setLightsMode(0);  // 0 = off (apagado)
@@ -97,9 +101,21 @@ void FSM::stateClasificar1() {
   }
 
   // Pasar al siguiente estado cuando termine el movimiento
-  if (robot.isMotionComplete()) {
-    currentState = -1;
+  while (!robot.isMotionComplete()) {
+    // mover servos de forma continua (no bloqueante)
+    robot.moveAllServosSmooth();
   }
+
+  delay(2000);
+  robot.setTargetBin(0);
+
+  // Pasar al siguiente estado cuando termine el movimiento
+  while (!robot.isMotionComplete()) {
+    // mover servos de forma continua (no bloqueante)
+    robot.moveAllServosSmooth();
+  }
+
+  currentState = -1;
 }
 
 
@@ -111,7 +127,10 @@ void FSM::stateClasificar2() {
     stateEntryTime = millis();
     firstEntry = false;
 
-    residuoId = robot.readIntValue("RESIDUO");
+    do{
+      residuoId = robot.readIntValue("RESIDUO");
+    }while(residuoId==-2);
+
     if (residuoId != -1) {
       robot.setTargetBin(residuoId);
       
@@ -126,20 +145,29 @@ void FSM::stateClasificar2() {
       }
     }
   }
-
-  // mover servos de forma continua (no bloqueante)
-  robot.moveAllServosSmooth();
-
+  
   // Apagar luces después de animación completa
   if (lightsOn && millis() - stateEntryTime > 5000) {  // 5s para dar tiempo a animación
     robot.setLightsMode(0);  // 0 = off (apagado)
     lightsOn = false;
   }
+  
+  // Pasar al siguiente estado cuando termine el movimiento
+  while (!robot.isMotionComplete()) {
+    // mover servos de forma continua (no bloqueante)
+    robot.moveAllServosSmooth();
+  }
+
+  delay(2000);
+  robot.setTargetBin(0);
 
   // Pasar al siguiente estado cuando termine el movimiento
-  if (robot.isMotionComplete()) {
-    currentState = -1;
+  while (!robot.isMotionComplete()) {
+    // mover servos de forma continua (no bloqueante)
+    robot.moveAllServosSmooth();
   }
+
+  currentState = -1;
 }
 
 void FSM::stateAgradecimiento() {
