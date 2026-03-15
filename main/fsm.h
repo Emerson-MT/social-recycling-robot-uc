@@ -6,13 +6,13 @@
 
 class FSM {
   public:
-    FSM(Recycling_robot& robot);
+    FSM(RecyclingRobot& robot); //Cambie el Recycling_robot por RecyclingRobot (revisar recycling_robot.h)
 
     void run();  // Se llama en loop()
 
   private:
 
-    Recycling_robot& robot;
+    RecyclingRobot& robot; //Cambie el Recycling_robot por RecyclingRobot (revisar recycling_robot.h)
 
     int currentState;
     int previousState = -1;

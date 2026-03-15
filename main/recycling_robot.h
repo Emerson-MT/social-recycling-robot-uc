@@ -33,7 +33,7 @@ public:
     // Métodos de conveniencia para los servos
     void moveAllServosSmooth();
     bool isMotionComplete();
-    void setTargetAngles(int t);
+    void setTargetBin(int binId);  // Ahora recibe ID del contenedor (0-4)
 
     // Métodos de conveniencia para comunicación
     void sendMessage(const String& msg);

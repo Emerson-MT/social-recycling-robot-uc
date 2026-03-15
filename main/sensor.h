@@ -19,6 +19,7 @@ class Sensor {
 class UserDetector {
   public:
     UserDetector(Sensor& s1, Sensor& s2);
+    void init();                  // ⬅️ AGREGADO: Método para inicializar sensores
     bool detectUser();
   private:
     Sensor& sensorA;
@@ -32,10 +33,14 @@ class UserDetector {
 class WasteDetector {
   public:
     WasteDetector(Sensor& s);
+    void init();                  // ⬅️ AGREGADO: Método para inicializar sensor
     bool detectWaste();
   private:
     Sensor& sensor;
     const uint16_t threshold = 200; // 20 cm en mm
 };
 
+void initAllVL53L0XSensors(uint8_t* xshutPins, uint8_t numSensors);
+
 #endif
+
