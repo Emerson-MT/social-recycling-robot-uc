@@ -1,0 +1,46 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+peri_venv/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Arduino / C++ ---
+**/build/
+**/bin/
+**/obj/
+.pio/
+.clang-format
+*.hex
+*.elf
+*.bin
+
+# --- VS Code & Editores ---
+.vscode/
+.history/
+*.code-workspace
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Hailo / Modelos (Opcional) ---
+# Si tus modelos .hef pesan mucho (>50MB), mejor no subirlos al repo
+# *.hef
+
+# --- Logs y Temporales ---
+*.log
+src/robot_project/audio/*.wav
+src/robot_project/audio/*.mp3
+!src/robot_project/audio/starting_sound-effect.wav
+temp/
+tmp/
+
+# --- Otros ---
+.target/
